@@ -8,7 +8,9 @@
     "test:basic": "node test/basic-validation.js",
     "test:cache": "node test/cache-key-analysis.js",
     "test:summary": "node test/job-summary-test.js",
-    "test:safety": "node test/tarball-cache-safety.js"
+    "test:safety": "node test/tarball-cache-safety.js",
+    "build": "ncc build main.js -o dist --license licenses.txt && ncc build post.js -o dist/post --license licenses.txt",
+    "package": "npm run build"
   },
   "keywords": [],
   "author": "",
@@ -20,5 +22,8 @@
     "@actions/github": "^6.0.1",
     "@actions/tool-cache": "^2.0.2",
     "sodium-native": "^5.0.4"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.3"
   }
 }
