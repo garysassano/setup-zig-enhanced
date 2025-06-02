@@ -1,4 +1,11 @@
-const sodium = require('sodium-native');
+const _sodium = require('libsodium-wrappers');
+
+// Initialize sodium and make it available
+let sodium;
+(async () => {
+  await _sodium.ready;
+  sodium = _sodium;
+})();
 
 // Parse a minisign key represented as a base64 string.
 // Throws exceptions on invalid keys.
