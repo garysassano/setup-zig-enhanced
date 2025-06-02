@@ -1,0 +1,30 @@
+name: Debug Download Issue
+on: workflow_dispatch
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Test with version 0.13.0 (known to exist)
+        uses: ./
+        with:
+          version: '0.13.0'
+          use-cache: false
+        continue-on-error: true
+
+      - name: Test with latest version
+        uses: ./
+        with:
+          version: 'latest'
+          use-cache: false
+        continue-on-error: true
+
+      - name: Test with master
+        uses: ./
+        with:
+          version: 'master'
+          use-cache: false
+        continue-on-error: true

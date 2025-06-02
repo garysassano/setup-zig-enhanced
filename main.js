@@ -10,8 +10,16 @@ const minisign = require('./minisign');
 // Upstream's minisign key, from https://ziglang.org/download
 const MINISIGN_KEY = 'RWSGOq2NVecA2UPNdBUZykf1CCb147pkmdtYxgb3Ti+JO/wCYvhbAb/U';
 
-// The base URL of the official builds of Zig. This is only used as a fallback, if all mirrors fail.
-const CANONICAL = 'https://ziglang.org/builds';
+// Function to get the correct base URL for downloading Zig based on version
+function getCanonicalBaseUrl(version) {
+  // Master builds and dev versions use the builds endpoint
+  if (version.includes('-dev')) {
+    return 'https://ziglang.org/builds';
+  }
+
+  // Stable releases use the download endpoint with version path
+  return `https://ziglang.org/download/${version}`;
+}
 
 // The list of mirrors we attempt to fetch from. These need not be trusted, as
 // we always verify the minisign signature.
@@ -19,9 +27,17 @@ const CANONICAL = 'https://ziglang.org/builds';
 const MIRRORS = require('./mirrors.json').map((x) => x[0]);
 
 async function downloadFromMirror(mirror, tarballFilename) {
-  const tarballPath = await tc.downloadTool(`${mirror}/${tarballFilename}?source=github-actions`);
+  const tarballUrl = `${mirror}/${tarballFilename}?source=github-actions`;
+  const signatureUrl = `${mirror}/${tarballFilename}.minisig?source=github-actions`;
 
-  const signatureResponse = await fetch(`${mirror}/${tarballFilename}.minisig?source=github-actions`);
+  core.info(`Downloading tarball: ${tarballUrl}`);
+  const tarballPath = await tc.downloadTool(tarballUrl);
+
+  core.info(`Downloading signature: ${signatureUrl}`);
+  const signatureResponse = await fetch(signatureUrl);
+  if (!signatureResponse.ok) {
+    throw new Error(`Failed to download signature: ${signatureResponse.status} ${signatureResponse.statusText}`);
+  }
   const signatureData = Buffer.from(await signatureResponse.arrayBuffer());
 
   const tarballData = await fs.readFile(tarballPath);
@@ -43,6 +59,9 @@ async function downloadFromMirror(mirror, tarballFilename) {
 }
 
 async function downloadTarball(tarballFilename) {
+  const version = await common.getVersion();
+  const canonicalBaseUrl = getCanonicalBaseUrl(version);
+
   const preferredMirror = core.getInput('mirror');
   if (preferredMirror.includes("://ziglang.org/") || preferredMirror.startsWith("ziglang.org/")) {
     throw new Error("'https://ziglang.org' cannot be used as mirror override; for more information see README.md");
@@ -64,8 +83,8 @@ async function downloadTarball(tarballFilename) {
       // continue loop to next mirror
     }
   }
-  core.info(`Attempting official: ${CANONICAL}`);
-  return await downloadFromMirror(CANONICAL, tarballFilename);
+  core.info(`Attempting official: ${canonicalBaseUrl}`);
+  return await downloadFromMirror(canonicalBaseUrl, tarballFilename);
 }
 
 async function retrieveTarball(tarballName, tarballExt, summaryData = {}) {
