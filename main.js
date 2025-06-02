@@ -28,7 +28,7 @@ async function downloadFromMirror(mirror, tarballFilename) {
 
   const key = minisign.parseKey(MINISIGN_KEY);
   const signature = minisign.parseSignature(signatureData);
-  if (!minisign.verifySignature(key, signature, tarballData)) {
+  if (!(await minisign.verifySignature(key, signature, tarballData))) {
     throw new Error(`signature verification failed for '${mirror}/${tarballFilename}'`);
   }
 
