@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Zig
-        uses: your-username/setup-zig@main # Replace with your GitHub username/repo
+        uses: garysassano/setup-zig-enhanced@main
         with:
           version: ${{ matrix.zig-version }}
           use-cache: true
