@@ -1,0 +1,24 @@
+{
+  "name": "setup-zig",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "for test in test/*.js; do echo \"Running $test...\"; node \"$test\"; echo; done",
+    "test:basic": "node test/basic-validation.js",
+    "test:cache": "node test/cache-key-analysis.js",
+    "test:summary": "node test/job-summary-test.js",
+    "test:safety": "node test/tarball-cache-safety.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@actions/cache": "^4.0.3",
+    "@actions/core": "^1.11.1",
+    "@actions/exec": "^1.1.1",
+    "@actions/github": "^6.0.1",
+    "@actions/tool-cache": "^2.0.2",
+    "sodium-native": "^5.0.4"
+  }
+}

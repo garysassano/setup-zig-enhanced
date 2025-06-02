@@ -1,0 +1,9 @@
+# Node.js
+node_modules/
+
+# Project specific
+check-mirrors-summary.md
+
+# Test outputs
+test/*.log
+test/*.tmp
